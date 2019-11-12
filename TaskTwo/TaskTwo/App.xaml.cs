@@ -1,40 +1,53 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using Xamarin.Forms;
 
 namespace TaskTwo
 {
     public partial class App : Application
     {
-        PopupManager popupManager;
-        ThreadManager threadManager;
+        const double PERIOD = 30.0;
+        bool alive;
         
         public App()
         {
             InitializeComponent();
 
             MainPage = new NavigationPage(new MainPage { Title = "Main page"});
-            popupManager = new PopupManager();
-            threadManager = new ThreadManager();
-            Thread myThread = threadManager.GetThread();
-            myThread.Start();
+            alive = true;
+            Device.StartTimer(TimeSpan.FromSeconds(PERIOD), OnTimerTick);
         }
         
         protected override void OnStart()
         {
             // Handle when your app starts
-            popupManager.OutputPopup("OnStart");
+            OutputPopup("OnStart");
         }
 
         protected override void OnSleep()
         {
             // Handle when your app sleeps
-            popupManager.OutputPopup("OnSleep");
+            OutputPopup("OnSleep");
         }
 
         protected override void OnResume()
         {
             // Handle when your app resumes
-            popupManager.OutputPopup("OnResume");
+            OutputPopup("OnResume");
+        }
+
+        private bool OnTimerTick()
+        {
+            OutputPopup(DateTime.Now.ToString("T"));
+            return alive;
+        }
+
+        public async void OutputPopup(string message)
+        {
+            await App.Current.MainPage.DisplayAlert(
+                    "Message",
+                    message,
+                    "Ok");
         }
     }
 }
